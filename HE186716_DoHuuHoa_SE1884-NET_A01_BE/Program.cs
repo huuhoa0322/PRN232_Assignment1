@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using HE186716_DoHuuHoa_SE1884_NET_A01_BE.Models;
+using HE186716_DoHuuHoa_SE1884_NET_A01_BE.Repositories;
 
 namespace HE186716_DoHuuHoa_SE1884_NET_A01_BE
 {
@@ -8,8 +11,34 @@ namespace HE186716_DoHuuHoa_SE1884_NET_A01_BE
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+                });
 
-            builder.Services.AddControllers();
+            // Configure DbContext
+            builder.Services.AddDbContext<FunewsManagementContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
+
+            // Register Repositories (Scoped - one instance per request)
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<INewsArticleRepository, NewsArticleRepository>();
+            builder.Services.AddScoped<ITagRepository, TagRepository>();
+
+            // Configure CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -23,8 +52,9 @@ namespace HE186716_DoHuuHoa_SE1884_NET_A01_BE
                 app.UseSwaggerUI();
             }
 
-            app.UseAuthorization();
+            app.UseCors("AllowFrontend");
 
+            app.UseAuthorization();
 
             app.MapControllers();
 
@@ -32,3 +62,4 @@ namespace HE186716_DoHuuHoa_SE1884_NET_A01_BE
         }
     }
 }
+
