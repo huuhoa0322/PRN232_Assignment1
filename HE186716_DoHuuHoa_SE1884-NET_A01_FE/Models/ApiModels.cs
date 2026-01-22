@@ -51,3 +51,115 @@ public class TagDto
     public string? TagName { get; set; }
     public string? Note { get; set; }
 }
+
+// ===== ACCOUNT DTOs =====
+public class AccountDto
+{
+    public short AccountId { get; set; }
+    public string? AccountName { get; set; }
+    public string? AccountEmail { get; set; }
+    public int? AccountRole { get; set; }
+    public string RoleName { get; set; } = null!;
+    public int ArticleCount { get; set; }
+}
+
+public class CreateAccountDto
+{
+    public string AccountName { get; set; } = null!;
+    public string AccountEmail { get; set; } = null!;
+    public string AccountPassword { get; set; } = null!;
+    public int AccountRole { get; set; }
+}
+
+public class UpdateAccountDto
+{
+    public string AccountName { get; set; } = null!;
+    public string AccountEmail { get; set; } = null!;
+    public string? AccountPassword { get; set; }
+    public int AccountRole { get; set; }
+}
+
+// ===== REPORT DTOs =====
+public class ReportStatisticsDto
+{
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
+    public int TotalArticles { get; set; }
+    public int ActiveArticles { get; set; }
+    public int InactiveArticles { get; set; }
+    public List<CategoryStatDto> CategoryStats { get; set; } = new();
+    public List<AuthorStatDto> AuthorStats { get; set; } = new();
+}
+
+public class CategoryStatDto
+{
+    public short CategoryId { get; set; }
+    public string? CategoryName { get; set; }
+    public int ArticleCount { get; set; }
+    public int ActiveCount { get; set; }
+    public int InactiveCount { get; set; }
+}
+
+public class AuthorStatDto
+{
+    public short AccountId { get; set; }
+    public string? AccountName { get; set; }
+    public int ArticleCount { get; set; }
+    public int ActiveCount { get; set; }
+    public int InactiveCount { get; set; }
+}
+
+// ===== CATEGORY CREATE/UPDATE DTOs =====
+public class CreateCategoryDto
+{
+    public string CategoryName { get; set; } = null!;
+    public string CategoryDesciption { get; set; } = null!;
+    public short? ParentCategoryId { get; set; }
+    public bool IsActive { get; set; } = true;
+}
+
+public class UpdateCategoryDto
+{
+    public string CategoryName { get; set; } = null!;
+    public string CategoryDesciption { get; set; } = null!;
+    public short? ParentCategoryId { get; set; }
+    public bool? IsActive { get; set; }
+}
+
+// ===== NEWS ARTICLE CREATE/UPDATE DTOs =====
+public class CreateNewsArticleDto
+{
+    public string? NewsTitle { get; set; }
+    public string Headline { get; set; } = null!;
+    public string? NewsContent { get; set; }
+    public string? NewsSource { get; set; }
+    public short? CategoryId { get; set; }
+    public bool NewsStatus { get; set; } = true;
+    public List<int>? TagIds { get; set; }
+}
+
+public class UpdateNewsArticleDto
+{
+    public string? NewsTitle { get; set; }
+    public string Headline { get; set; } = null!;
+    public string? NewsContent { get; set; }
+    public string? NewsSource { get; set; }
+    public short? CategoryId { get; set; }
+    public bool? NewsStatus { get; set; }
+    public List<int>? TagIds { get; set; }
+}
+
+// ===== TAG CREATE/UPDATE DTOs =====
+public class CreateTagDto
+{
+    public string TagName { get; set; } = null!;
+    public string? Note { get; set; }
+}
+
+public class UpdateTagDto
+{
+    public string TagName { get; set; } = null!;
+    public string? Note { get; set; }
+}
+
+

@@ -90,4 +90,185 @@ public class ApiService
         }
         return new();
     }
+
+    // ===== ACCOUNTS (Admin) =====
+    public async Task<List<AccountDto>> GetAllAccountsAsync()
+    {
+        var response = await _httpClient.GetAsync("api/account");
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<List<AccountDto>>(_jsonOptions) ?? new();
+        }
+        return new();
+    }
+
+    public async Task<List<AccountDto>> SearchAccountsAsync(string? keyword, int? role)
+    {
+        var url = "api/account/search?";
+        if (!string.IsNullOrEmpty(keyword))
+            url += $"keyword={Uri.EscapeDataString(keyword)}&";
+        if (role.HasValue)
+            url += $"role={role}&";
+        
+        var response = await _httpClient.GetAsync(url.TrimEnd('&', '?'));
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<List<AccountDto>>(_jsonOptions) ?? new();
+        }
+        return new();
+    }
+
+    public async Task<(bool Success, string Message)> CreateAccountAsync(CreateAccountDto dto)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/account", dto);
+        if (response.IsSuccessStatusCode)
+            return (true, "Account created successfully");
+        
+        var error = await response.Content.ReadAsStringAsync();
+        return (false, error);
+    }
+
+    public async Task<(bool Success, string Message)> UpdateAccountAsync(short id, UpdateAccountDto dto)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"api/account/{id}", dto);
+        if (response.IsSuccessStatusCode)
+            return (true, "Account updated successfully");
+        
+        var error = await response.Content.ReadAsStringAsync();
+        return (false, error);
+    }
+
+    public async Task<(bool Success, string Message)> DeleteAccountAsync(short id)
+    {
+        var response = await _httpClient.DeleteAsync($"api/account/{id}");
+        if (response.IsSuccessStatusCode)
+            return (true, "Account deleted successfully");
+        
+        var error = await response.Content.ReadAsStringAsync();
+        return (false, error);
+    }
+
+    // ===== REPORTS (Admin) =====
+    public async Task<ReportStatisticsDto?> GetReportStatisticsAsync(DateTime? startDate, DateTime? endDate)
+    {
+        var url = "api/report/statistics?";
+        if (startDate.HasValue)
+            url += $"startDate={startDate.Value:yyyy-MM-dd}&";
+        if (endDate.HasValue)
+            url += $"endDate={endDate.Value:yyyy-MM-dd}&";
+        
+        var response = await _httpClient.GetAsync(url.TrimEnd('&', '?'));
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<ReportStatisticsDto>(_jsonOptions);
+        }
+        return null;
+    }
+
+    // ===== CATEGORIES (Staff) =====
+    public async Task<List<CategoryDto>> GetAllCategoriesAsync()
+    {
+        var response = await _httpClient.GetAsync("api/category");
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<List<CategoryDto>>(_jsonOptions) ?? new();
+        return new();
+    }
+
+    public async Task<(bool Success, string Message)> CreateCategoryAsync(CreateCategoryDto dto)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/category", dto);
+        if (response.IsSuccessStatusCode) return (true, "Success");
+        return (false, await response.Content.ReadAsStringAsync());
+    }
+
+    public async Task<(bool Success, string Message)> UpdateCategoryAsync(short id, UpdateCategoryDto dto)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"api/category/{id}", dto);
+        if (response.IsSuccessStatusCode) return (true, "Success");
+        return (false, await response.Content.ReadAsStringAsync());
+    }
+
+    public async Task<(bool Success, string Message)> DeleteCategoryAsync(short id)
+    {
+        var response = await _httpClient.DeleteAsync($"api/category/{id}");
+        if (response.IsSuccessStatusCode) return (true, "Success");
+        return (false, await response.Content.ReadAsStringAsync());
+    }
+
+    // ===== NEWS ARTICLES (Staff) =====
+    public async Task<List<NewsArticleDto>> GetAllNewsAsync()
+    {
+        var response = await _httpClient.GetAsync("api/news/all");
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<List<NewsArticleDto>>(_jsonOptions) ?? new();
+        return new();
+    }
+
+    public async Task<List<NewsArticleDto>> GetNewsByAuthorAsync(short authorId)
+    {
+        var response = await _httpClient.GetAsync($"api/news/author/{authorId}");
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<List<NewsArticleDto>>(_jsonOptions) ?? new();
+        return new();
+    }
+
+    public async Task<(bool Success, string Message)> CreateNewsAsync(CreateNewsArticleDto dto, short createdById)
+    {
+        var response = await _httpClient.PostAsJsonAsync($"api/news?createdById={createdById}", dto);
+        if (response.IsSuccessStatusCode) return (true, "Success");
+        return (false, await response.Content.ReadAsStringAsync());
+    }
+
+    public async Task<(bool Success, string Message)> UpdateNewsAsync(string id, UpdateNewsArticleDto dto, short updatedById)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"api/news/{id}?updatedById={updatedById}", dto);
+        if (response.IsSuccessStatusCode) return (true, "Success");
+        return (false, await response.Content.ReadAsStringAsync());
+    }
+
+    public async Task<(bool Success, string Message)> DeleteNewsAsync(string id)
+    {
+        var response = await _httpClient.DeleteAsync($"api/news/{id}");
+        if (response.IsSuccessStatusCode) return (true, "Success");
+        return (false, await response.Content.ReadAsStringAsync());
+    }
+
+    public async Task<(bool Success, string Message)> DuplicateNewsAsync(string id, short createdById)
+    {
+        var response = await _httpClient.PostAsync($"api/news/{id}/duplicate?createdById={createdById}", null);
+        if (response.IsSuccessStatusCode) return (true, "Success");
+        return (false, await response.Content.ReadAsStringAsync());
+    }
+
+    // ===== TAGS (Staff) =====
+    public async Task<List<TagDto>> GetAllTagsAsync()
+    {
+        var response = await _httpClient.GetAsync("api/tag");
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<List<TagDto>>(_jsonOptions) ?? new();
+        return new();
+    }
+
+    public async Task<(bool Success, string Message)> CreateTagAsync(CreateTagDto dto)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/tag", dto);
+        if (response.IsSuccessStatusCode) return (true, "Success");
+        return (false, await response.Content.ReadAsStringAsync());
+    }
+
+    public async Task<(bool Success, string Message)> UpdateTagAsync(int id, UpdateTagDto dto)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"api/tag/{id}", dto);
+        if (response.IsSuccessStatusCode) return (true, "Success");
+        return (false, await response.Content.ReadAsStringAsync());
+    }
+
+    public async Task<(bool Success, string Message)> DeleteTagAsync(int id)
+    {
+        var response = await _httpClient.DeleteAsync($"api/tag/{id}");
+        if (response.IsSuccessStatusCode) return (true, "Success");
+        return (false, await response.Content.ReadAsStringAsync());
+    }
 }
+
+

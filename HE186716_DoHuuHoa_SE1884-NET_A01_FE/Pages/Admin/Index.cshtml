@@ -1,0 +1,28 @@
+@page
+@model HE186716_DoHuuHoa_SE1884_NET_A01_FE.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h2>Admin Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Quản lý Accounts</h5>
+                <p class="card-text">Quản lý tài khoản hệ thống (Staff, Lecturer)</p>
+                <a asp-page="/Admin/Accounts" class="btn btn-primary">Xem danh sách</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Báo cáo thống kê</h5>
+                <p class="card-text">Xem báo cáo thống kê bài viết theo thời gian</p>
+                <a asp-page="/Admin/Report" class="btn btn-primary">Xem báo cáo</a>
+            </div>
+        </div>
+    </div>
+</div>

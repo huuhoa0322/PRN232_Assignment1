@@ -1,0 +1,177 @@
+@page
+@model HE186716_DoHuuHoa_SE1884_NET_A01_FE.Pages.Admin.AccountsModel
+@{
+    ViewData["Title"] = "Quản lý Accounts";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Quản lý Accounts</h2>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#accountModal" onclick="openCreateModal()">
+        + Thêm Account
+    </button>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger") alert-dismissible fade show">
+        @Model.Message
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <input type="text" name="keyword" value="@Model.Keyword" class="form-control" placeholder="Tìm theo tên hoặc email..." />
+            </div>
+            <div class="col-md-4">
+                <select name="role" class="form-select">
+                    <option value="">-- Tất cả role --</option>
+                    <option value="1" selected="@(Model.Role == 1)">Staff</option>
+                    <option value="2" selected="@(Model.Role == 2)">Lecturer</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Tên</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Số bài viết</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var account in Model.Accounts)
+        {
+            <tr>
+                <td>@account.AccountId</td>
+                <td>@account.AccountName</td>
+                <td>@account.AccountEmail</td>
+                <td>
+                    <span class="badge @(account.AccountRole == 1 ? "bg-primary" : "bg-secondary")">
+                        @account.RoleName
+                    </span>
+                </td>
+                <td>@account.ArticleCount</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#accountModal"
+                            onclick="openEditModal(@account.AccountId, '@account.AccountName', '@account.AccountEmail', @account.AccountRole)">
+                        Sửa
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                            onclick="openDeleteModal(@account.AccountId, '@account.AccountName')">
+                        Xóa
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Account Modal -->
+<div class="modal fade" id="accountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Thêm Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="AccountId" id="accountId" />
+                    <input type="hidden" name="handler" id="formHandler" value="Create" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Tên</label>
+                        <input type="text" name="AccountName" id="accountName" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="AccountEmail" id="accountEmail" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mật khẩu</label>
+                        <input type="password" name="AccountPassword" id="accountPassword" class="form-control" />
+                        <small class="text-muted" id="passwordHint">Bắt buộc khi tạo mới</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select name="AccountRole" id="accountRole" class="form-select" required>
+                            <option value="1">Staff</option>
+                            <option value="2">Lecturer</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Delete">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xác nhận xóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="deleteId" id="deleteId" />
+                    <p>Bạn có chắc muốn xóa account: <strong id="deleteName"></strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function openCreateModal() {
+        document.getElementById('modalTitle').textContent = 'Thêm Account';
+        document.getElementById('formHandler').value = 'Create';
+        document.getElementById('accountId').value = '';
+        document.getElementById('accountName').value = '';
+        document.getElementById('accountEmail').value = '';
+        document.getElementById('accountPassword').value = '';
+        document.getElementById('accountPassword').required = true;
+        document.getElementById('passwordHint').textContent = 'Bắt buộc khi tạo mới';
+        document.getElementById('accountRole').value = '1';
+    }
+
+    function openEditModal(id, name, email, role) {
+        document.getElementById('modalTitle').textContent = 'Sửa Account';
+        document.getElementById('formHandler').value = 'Update';
+        document.getElementById('accountId').value = id;
+        document.getElementById('accountName').value = name;
+        document.getElementById('accountEmail').value = email;
+        document.getElementById('accountPassword').value = '';
+        document.getElementById('accountPassword').required = false;
+        document.getElementById('passwordHint').textContent = 'Để trống nếu không đổi mật khẩu';
+        document.getElementById('accountRole').value = role;
+    }
+
+    function openDeleteModal(id, name) {
+        document.getElementById('deleteId').value = id;
+        document.getElementById('deleteName').textContent = name;
+    }
+</script>
+}

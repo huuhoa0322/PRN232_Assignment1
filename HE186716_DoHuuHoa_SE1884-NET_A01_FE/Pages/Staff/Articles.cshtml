@@ -1,0 +1,173 @@
+@page
+@model HE186716_DoHuuHoa_SE1884_NET_A01_FE.Pages.Staff.ArticlesModel
+@{
+    ViewData["Title"] = "Quản lý Articles";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Quản lý Articles</h2>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#articleModal" onclick="openCreateModal()">
+        + Thêm Article
+    </button>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger") alert-dismissible fade show">
+        @Model.Message
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Tiêu đề</th>
+            <th>Category</th>
+            <th>Ngày tạo</th>
+            <th>Status</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var article in Model.Articles)
+        {
+            <tr>
+                <td>@article.NewsArticleId</td>
+                <td>@article.NewsTitle</td>
+                <td>@article.CategoryName</td>
+                <td>@article.CreatedDate?.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <span class="badge @(article.NewsStatus == true ? "bg-success" : "bg-secondary")">
+                        @(article.NewsStatus == true ? "Active" : "Inactive")
+                    </span>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#articleModal"
+                            onclick='openEditModal("@article.NewsArticleId", "@article.NewsTitle?.Replace("\"", "\\\"")", "@article.Headline?.Replace("\"", "\\\"")", @(article.CategoryId ?? 0), @(article.NewsStatus == true ? "true" : "false"))'>
+                        Sửa
+                    </button>
+                    <form method="post" asp-page-handler="Duplicate" style="display:inline;">
+                        <input type="hidden" name="duplicateId" value="@article.NewsArticleId" />
+                        <button type="submit" class="btn btn-sm btn-info">Copy</button>
+                    </form>
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                            onclick='openDeleteModal("@article.NewsArticleId", "@article.NewsTitle?.Replace("\"", "\\\"")")'>
+                        Xóa
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Article Modal -->
+<div class="modal fade" id="articleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Thêm Article</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="ArticleId" id="articleId" />
+                    <input type="hidden" name="handler" id="formHandler" value="Create" />
+                    
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">Tiêu đề</label>
+                            <input type="text" name="NewsTitle" id="newsTitle" class="form-control" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Category</label>
+                            <select name="CategoryId" id="categoryId" class="form-select">
+                                @foreach (var cat in Model.Categories)
+                                {
+                                    <option value="@cat.CategoryId">@cat.CategoryName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Headline *</label>
+                        <input type="text" name="Headline" id="headline" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nội dung</label>
+                        <textarea name="NewsContent" id="newsContent" class="form-control" rows="5"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">Nguồn</label>
+                            <input type="text" name="NewsSource" id="newsSource" class="form-control" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check mt-4">
+                                <input type="checkbox" name="NewsStatus" id="newsStatus" class="form-check-input" value="true" checked />
+                                <label class="form-check-label">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Delete">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xác nhận xóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="deleteId" id="deleteId" />
+                    <p>Bạn có chắc muốn xóa bài viết: <strong id="deleteName"></strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function openCreateModal() {
+        document.getElementById('modalTitle').textContent = 'Thêm Article';
+        document.getElementById('formHandler').value = 'Create';
+        document.getElementById('articleId').value = '';
+        document.getElementById('newsTitle').value = '';
+        document.getElementById('headline').value = '';
+        document.getElementById('newsContent').value = '';
+        document.getElementById('newsSource').value = '';
+        document.getElementById('newsStatus').checked = true;
+    }
+
+    function openEditModal(id, title, headline, catId, status) {
+        document.getElementById('modalTitle').textContent = 'Sửa Article';
+        document.getElementById('formHandler').value = 'Update';
+        document.getElementById('articleId').value = id;
+        document.getElementById('newsTitle').value = title;
+        document.getElementById('headline').value = headline;
+        document.getElementById('categoryId').value = catId;
+        document.getElementById('newsStatus').checked = status;
+    }
+
+    function openDeleteModal(id, title) {
+        document.getElementById('deleteId').value = id;
+        document.getElementById('deleteName').textContent = title;
+    }
+</script>
+}

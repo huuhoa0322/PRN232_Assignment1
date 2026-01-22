@@ -1,0 +1,47 @@
+@page
+@model HE186716_DoHuuHoa_SE1884_NET_A01_FE.Pages.Staff.MyArticlesModel
+@{
+    ViewData["Title"] = "Bài viết của tôi";
+}
+
+<h2>Bài viết của tôi</h2>
+<p class="text-muted">Lịch sử bài viết đã tạo</p>
+
+@if (Model.Articles.Count == 0)
+{
+    <div class="alert alert-info">Bạn chưa tạo bài viết nào.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tiêu đề</th>
+                <th>Category</th>
+                <th>Ngày tạo</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var article in Model.Articles)
+            {
+                <tr>
+                    <td>@article.NewsArticleId</td>
+                    <td>
+                        <a asp-page="/News/Details" asp-route-id="@article.NewsArticleId">
+                            @article.NewsTitle
+                        </a>
+                    </td>
+                    <td>@article.CategoryName</td>
+                    <td>@article.CreatedDate?.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <span class="badge @(article.NewsStatus == true ? "bg-success" : "bg-secondary")">
+                            @(article.NewsStatus == true ? "Active" : "Inactive")
+                        </span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,124 @@
+@page
+@model HE186716_DoHuuHoa_SE1884_NET_A01_FE.Pages.Admin.ReportModel
+@{
+    ViewData["Title"] = "Báo cáo thống kê";
+}
+
+<h2>Báo cáo thống kê</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Từ ngày</label>
+                <input type="date" name="startDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Đến ngày</label>
+                <input type="date" name="endDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")" class="form-control" />
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Xem báo cáo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Statistics != null)
+{
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body text-center">
+                    <h3>@Model.Statistics.TotalArticles</h3>
+                    <p class="mb-0">Tổng bài viết</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success">
+                <div class="card-body text-center">
+                    <h3>@Model.Statistics.ActiveArticles</h3>
+                    <p class="mb-0">Bài viết Active</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-secondary">
+                <div class="card-body text-center">
+                    <h3>@Model.Statistics.InactiveArticles</h3>
+                    <p class="mb-0">Bài viết Inactive</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Thống kê theo Category
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Tổng</th>
+                                <th>Active</th>
+                                <th>Inactive</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cat in Model.Statistics.CategoryStats)
+                            {
+                                <tr>
+                                    <td>@cat.CategoryName</td>
+                                    <td>@cat.ArticleCount</td>
+                                    <td><span class="text-success">@cat.ActiveCount</span></td>
+                                    <td><span class="text-muted">@cat.InactiveCount</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Thống kê theo Author
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Author</th>
+                                <th>Tổng</th>
+                                <th>Active</th>
+                                <th>Inactive</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var author in Model.Statistics.AuthorStats)
+                            {
+                                <tr>
+                                    <td>@author.AccountName</td>
+                                    <td>@author.ArticleCount</td>
+                                    <td><span class="text-success">@author.ActiveCount</span></td>
+                                    <td><span class="text-muted">@author.InactiveCount</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        Chọn khoảng thời gian để xem báo cáo, hoặc để trống để xem tất cả.
+    </div>
+}

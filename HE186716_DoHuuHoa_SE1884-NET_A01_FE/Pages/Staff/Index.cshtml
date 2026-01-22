@@ -1,0 +1,59 @@
+@page
+@model HE186716_DoHuuHoa_SE1884_NET_A01_FE.Pages.Staff.IndexModel
+@{
+    ViewData["Title"] = "Staff Dashboard";
+}
+
+<h2>Staff Dashboard</h2>
+<p>Xin chào, <strong>@ViewContext.HttpContext.Session.GetString("UserName")</strong>!</p>
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Quản lý Categories</h5>
+                <p class="card-text">Quản lý danh mục tin tức</p>
+                <a asp-page="/Staff/Categories" class="btn btn-primary">Xem</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Quản lý Articles</h5>
+                <p class="card-text">Quản lý bài viết tin tức</p>
+                <a asp-page="/Staff/Articles" class="btn btn-primary">Xem</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Quản lý Tags</h5>
+                <p class="card-text">Quản lý tags cho bài viết</p>
+                <a asp-page="/Staff/Tags" class="btn btn-primary">Xem</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Bài viết của tôi</h5>
+                <p class="card-text">Xem lịch sử bài viết đã tạo</p>
+                <a asp-page="/Staff/MyArticles" class="btn btn-outline-primary">Xem</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Hồ sơ cá nhân</h5>
+                <p class="card-text">Quản lý thông tin cá nhân</p>
+                <a asp-page="/Staff/Profile" class="btn btn-outline-primary">Xem</a>
+            </div>
+        </div>
+    </div>
+</div>
