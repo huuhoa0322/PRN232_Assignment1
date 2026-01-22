@@ -3,7 +3,7 @@
 ## Thông tin dự án
 - **Sinh viên**: Đỗ Hữu Hòa (HE186716)
 - **Mã lớp**: SE1884-NET
-- **Môn học**: PRN232 - ASP.NET Core
+- **Môn học**: PRN232 - Building Cross-Platform Back-End Application With .NET
 - **Assignment**: 01
 
 ## Công nghệ sử dụng
@@ -39,16 +39,16 @@ HE186716_DoHuuHoa_A01/
 ## Hướng dẫn cài đặt
 
 ### 1. Yêu cầu hệ thống
-- Visual Studio 2022+
+- Visual Studio 2026
 - .NET 8.0 SDK
-- SQL Server 2019+
+- SQL Server 2025
 
 ### 2. Cấu hình Connection String
 **Backend** (`appsettings.json`):
 ```json
 {
   "ConnectionStrings": {
-    "FUNewsDB": "Server=YOUR_SERVER;Database=FUNewsManagement;Trusted_Connection=True;TrustServerCertificate=True"
+    "MyCnn": "Server=YOUR_SERVER;Database=FUNewsManagement;Trusted_Connection=True;TrustServerCertificate=True"
   }
 }
 ```
