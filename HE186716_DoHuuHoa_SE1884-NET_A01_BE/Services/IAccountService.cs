@@ -7,7 +7,8 @@ public interface IAccountService
 {
     Task<IEnumerable<AccountDto>> GetAllAsync();
     Task<AccountDto?> GetByIdAsync(short id);
-    Task<IEnumerable<AccountDto>> SearchAsync(string? keyword, int? role = null);
+    Task<IEnumerable<AccountDto>> SearchAsync(string? keyword, int? role);
+    Task<PagedResultDto<AccountDto>> SearchPagedAsync(string? keyword, int? role, int pageIndex, int pageSize);
     Task<AccountDto> CreateAsync(CreateAccountDto dto);
     Task<AccountDto?> UpdateAsync(short id, UpdateAccountDto dto);
     Task<(bool Success, string Message)> DeleteAsync(short id);

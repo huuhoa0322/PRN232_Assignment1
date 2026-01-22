@@ -19,6 +19,28 @@
     </div>
 }
 
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <input type="text" name="keyword" value="@Model.Keyword" class="form-control" placeholder="Tìm theo tiêu đề..." />
+            </div>
+            <div class="col-md-4">
+                <select name="searchCategoryId" class="form-select">
+                    <option value="">-- Tất cả category --</option>
+                    @foreach (var cat in Model.Categories)
+                    {
+                        <option value="@cat.CategoryId" selected="@(Model.SearchCategoryId == cat.CategoryId)">@cat.CategoryName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <table class="table table-striped table-hover">
     <thead class="table-dark">
         <tr>
@@ -61,6 +83,36 @@
         }
     </tbody>
 </table>
+
+<!-- Pagination -->
+@if (Model.TotalPages > 0)
+{
+    <nav>
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link" asp-page="./Articles"
+                   asp-route-pageIndex="@(Model.PageIndex - 1)"
+                   asp-route-keyword="@Model.Keyword"
+                   asp-route-searchCategoryId="@Model.SearchCategoryId">Previous</a>
+            </li>
+            @for (var i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                    <a class="page-link" asp-page="./Articles"
+                       asp-route-pageIndex="@i"
+                       asp-route-keyword="@Model.Keyword"
+                       asp-route-searchCategoryId="@Model.SearchCategoryId">@i</a>
+                </li>
+            }
+            <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                <a class="page-link" asp-page="./Articles"
+                   asp-route-pageIndex="@(Model.PageIndex + 1)"
+                   asp-route-keyword="@Model.Keyword"
+                   asp-route-searchCategoryId="@Model.SearchCategoryId">Next</a>
+            </li>
+        </ul>
+    </nav>
+}
 
 <!-- Article Modal -->
 <div class="modal fade" id="articleModal" tabindex="-1">

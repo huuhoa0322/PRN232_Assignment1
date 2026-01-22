@@ -31,7 +31,7 @@ public class CreateNewsArticleDto
     [StringLength(150, ErrorMessage = "Headline cannot exceed 150 characters")]
     public string Headline { get; set; } = null!;
 
-    [StringLength(4000, ErrorMessage = "Content cannot exceed 4000 characters")]
+    [StringLength(20000, ErrorMessage = "Content cannot exceed 20000 characters")]
     public string? NewsContent { get; set; }
 
     [StringLength(400, ErrorMessage = "Source cannot exceed 400 characters")]

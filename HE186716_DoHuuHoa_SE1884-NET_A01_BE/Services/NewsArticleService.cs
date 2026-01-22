@@ -1,6 +1,7 @@
 using HE186716_DoHuuHoa_SE1884_NET_A01_BE.DTOs;
 using HE186716_DoHuuHoa_SE1884_NET_A01_BE.Models;
 using HE186716_DoHuuHoa_SE1884_NET_A01_BE.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace HE186716_DoHuuHoa_SE1884_NET_A01_BE.Services;
 
@@ -214,4 +215,33 @@ public class NewsArticleService : INewsArticleService
             }).ToList() ?? new List<TagDto>()
         };
     }
+    public async Task<PagedResultDto<NewsArticleDto>> SearchPagedAsync(NewsArticleSearchDto searchDto, int pageIndex, int pageSize)
+    {
+        var articles = await _newsArticleRepository.SearchAsync(
+            searchDto.Keyword,
+            searchDto.CategoryId,
+            searchDto.Status);
+
+        // Filter by date range if provided - Note: Repository SearchAsync returns IEnumerable, ideally should be IQueryable
+        // For now we filter in memory since Repository pattern here returns IEnumerable
+        if (searchDto.StartDate.HasValue || searchDto.EndDate.HasValue)
+        {
+            articles = articles.Where(a =>
+                (!searchDto.StartDate.HasValue || a.CreatedDate >= searchDto.StartDate.Value) &&
+                (!searchDto.EndDate.HasValue || a.CreatedDate <= searchDto.EndDate.Value));
+        }
+
+        var totalCount = articles.Count();
+        
+        var pagedArticles = articles
+            .OrderByDescending(a => a.CreatedDate)
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        var dtos = pagedArticles.Select(MapToDto).ToList();
+
+        return new PagedResultDto<NewsArticleDto>(dtos, totalCount, pageIndex, pageSize);
+    }
 }
+

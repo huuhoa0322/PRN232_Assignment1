@@ -64,8 +64,25 @@ public class ApiService
         return new();
     }
 
+    public async Task<PagedResultDto<NewsArticleDto>?> SearchNewsPagedAsync(string? keyword, short? categoryId, int pageIndex, int pageSize)
+    {
+        var url = $"api/news/search?pageIndex={pageIndex}&pageSize={pageSize}&";
+        if (!string.IsNullOrEmpty(keyword))
+            url += $"keyword={Uri.EscapeDataString(keyword)}&";
+        if (categoryId.HasValue)
+            url += $"categoryId={categoryId}&";
+        
+        var response = await _httpClient.GetAsync(url.TrimEnd('&', '?'));
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<PagedResultDto<NewsArticleDto>>(_jsonOptions);
+        }
+        return null;
+    }
+
     public async Task<List<NewsArticleDto>> SearchNewsAsync(string? keyword, short? categoryId)
     {
+        // Adapter for legacy calls - API now returns PagedResult
         var url = "api/news/search?";
         if (!string.IsNullOrEmpty(keyword))
             url += $"keyword={Uri.EscapeDataString(keyword)}&";
@@ -75,7 +92,8 @@ public class ApiService
         var response = await _httpClient.GetAsync(url.TrimEnd('&', '?'));
         if (response.IsSuccessStatusCode)
         {
-            return await response.Content.ReadFromJsonAsync<List<NewsArticleDto>>(_jsonOptions) ?? new();
+            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<NewsArticleDto>>(_jsonOptions);
+            return result?.Items ?? new List<NewsArticleDto>();
         }
         return new();
     }
@@ -102,9 +120,9 @@ public class ApiService
         return new();
     }
 
-    public async Task<List<AccountDto>> SearchAccountsAsync(string? keyword, int? role)
+    public async Task<PagedResultDto<AccountDto>?> SearchAccountsPagedAsync(string? keyword, int? role, int pageIndex, int pageSize)
     {
-        var url = "api/account/search?";
+        var url = $"api/account/search?pageIndex={pageIndex}&pageSize={pageSize}&";
         if (!string.IsNullOrEmpty(keyword))
             url += $"keyword={Uri.EscapeDataString(keyword)}&";
         if (role.HasValue)
@@ -113,7 +131,31 @@ public class ApiService
         var response = await _httpClient.GetAsync(url.TrimEnd('&', '?'));
         if (response.IsSuccessStatusCode)
         {
-            return await response.Content.ReadFromJsonAsync<List<AccountDto>>(_jsonOptions) ?? new();
+            return await response.Content.ReadFromJsonAsync<PagedResultDto<AccountDto>>(_jsonOptions);
+        }
+        return null;
+    }
+
+    public async Task<List<AccountDto>> SearchAccountsAsync(string? keyword, int? role)
+    {
+        // Fallback or deprecated
+        var url = "api/account/search?";
+        if (!string.IsNullOrEmpty(keyword))
+            url += $"keyword={Uri.EscapeDataString(keyword)}&";
+        if (role.HasValue)
+            url += $"role={role}&";
+        
+        var response = await _httpClient.GetAsync(url.TrimEnd('&', '?'));
+         if (response.IsSuccessStatusCode)
+        {
+             // Note: The API might now return PagedResult by default for search endpoint if we changed it completely.
+             // But in AccountController we changed Search to return PagedResult.
+             // So this legacy method might break if we calling the same endpoint.
+             // Let's assume we use the new method primarily.
+             // If we changed the endpoint signature JSON return type, we need to adapt here.
+             // Since we changed AccountController.Search to return PagedResult, we should parse it as such and return Items.
+            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<AccountDto>>(_jsonOptions);
+            return result?.Items ?? new List<AccountDto>();
         }
         return new();
     }

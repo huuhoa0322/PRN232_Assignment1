@@ -13,6 +13,20 @@ public class ArticlesModel : PageModel
     public string? Message { get; set; }
     public bool IsSuccess { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public string? Keyword { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public short? SearchCategoryId { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public int PageIndex { get; set; } = 1;
+
+    public int TotalPages { get; set; }
+    public int PageSize { get; set; } = 10;
+    public bool HasPreviousPage => PageIndex > 1;
+    public bool HasNextPage => PageIndex < TotalPages;
+
     public ArticlesModel(ApiService apiService) => _apiService = apiService;
 
     private short GetUserId() => short.TryParse(HttpContext.Session.GetString("UserId"), out var id) ? id : (short)0;
@@ -20,8 +34,8 @@ public class ArticlesModel : PageModel
     public async Task<IActionResult> OnGetAsync()
     {
         if (HttpContext.Session.GetString("Role") != "1") return RedirectToPage("/Auth/Login");
-        Articles = await _apiService.GetAllNewsAsync();
-        Categories = await _apiService.GetActiveCategoriesAsync();
+
+        await LoadDataAsync();
         return Page();
     }
 
@@ -53,8 +67,7 @@ public class ArticlesModel : PageModel
             IsSuccess = result.Success;
         }
 
-        Articles = await _apiService.GetAllNewsAsync();
-        Categories = await _apiService.GetActiveCategoriesAsync();
+        await LoadDataAsync();
         return Page();
     }
 
@@ -64,8 +77,8 @@ public class ArticlesModel : PageModel
         var result = await _apiService.DeleteNewsAsync(deleteId);
         Message = result.Success ? "Xóa thành công" : result.Message;
         IsSuccess = result.Success;
-        Articles = await _apiService.GetAllNewsAsync();
-        Categories = await _apiService.GetActiveCategoriesAsync();
+        
+        await LoadDataAsync();
         return Page();
     }
 
@@ -75,8 +88,23 @@ public class ArticlesModel : PageModel
         var result = await _apiService.DuplicateNewsAsync(duplicateId, GetUserId());
         Message = result.Success ? "Duplicate thành công" : result.Message;
         IsSuccess = result.Success;
-        Articles = await _apiService.GetAllNewsAsync();
-        Categories = await _apiService.GetActiveCategoriesAsync();
+        
+        await LoadDataAsync();
         return Page();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        Categories = await _apiService.GetActiveCategoriesAsync();
+        var pagedResult = await _apiService.SearchNewsPagedAsync(Keyword, SearchCategoryId, PageIndex, PageSize);
+        if (pagedResult != null)
+        {
+            Articles = pagedResult.Items;
+            TotalPages = pagedResult.TotalPages;
+        }
+        else
+        {
+            Articles = new List<NewsArticleDto>();
+        }
     }
 }

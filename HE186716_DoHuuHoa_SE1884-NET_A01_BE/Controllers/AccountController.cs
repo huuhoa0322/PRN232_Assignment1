@@ -39,13 +39,17 @@ public class AccountController : ControllerBase
     }
 
     /// <summary>
-    /// Search accounts by keyword and/or role
+    /// Search accounts by keyword and/or role with pagination
     /// </summary>
     [HttpGet("search")]
-    public async Task<ActionResult<IEnumerable<AccountDto>>> Search([FromQuery] string? keyword, [FromQuery] int? role)
+    public async Task<ActionResult<PagedResultDto<AccountDto>>> Search(
+        [FromQuery] string? keyword, 
+        [FromQuery] int? role, 
+        [FromQuery] int pageIndex = 1, 
+        [FromQuery] int pageSize = 10)
     {
-        var accounts = await _accountService.SearchAsync(keyword, role);
-        return Ok(accounts);
+        var result = await _accountService.SearchPagedAsync(keyword, role, pageIndex, pageSize);
+        return Ok(result);
     }
 
     /// <summary>

@@ -1,0 +1,59 @@
+<!-- Toast Notification Container -->
+<div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="d-none position-fixed top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5); z-index: 9999;">
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toast Notification Function
+    function showToast(message, type = 'success') {
+        const toastId = 'toast-' + Date.now();
+        const bgClass = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : 'bg-info';
+        
+        const toastHtml = `
+            <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('toastContainer').insertAdjacentHTML('beforeend', toastHtml);
+        const toastEl = new bootstrap.Toast(document.getElementById(toastId));
+        toastEl.show();
+        
+        // Auto remove after hidden
+        document.getElementById(toastId).addEventListener('hidden.bs.toast', function() {
+            this.remove();
+        });
+    }
+
+    // Loading Functions
+    function showLoading() {
+        document.getElementById('loadingOverlay').classList.remove('d-none');
+    }
+
+    function hideLoading() {
+        document.getElementById('loadingOverlay').classList.add('d-none');
+    }
+
+    // Auto-show toast for server messages
+    document.addEventListener('DOMContentLoaded', function() {
+        const alertSuccess = document.querySelector('.alert-success');
+        const alertDanger = document.querySelector('.alert-danger');
+        
+        if (alertSuccess) {
+            showToast(alertSuccess.textContent.trim(), 'success');
+        }
+        if (alertDanger) {
+            showToast(alertDanger.textContent.trim(), 'danger');
+        }
+    });
+</script>

@@ -1,6 +1,7 @@
 using HE186716_DoHuuHoa_SE1884_NET_A01_BE.DTOs;
 using HE186716_DoHuuHoa_SE1884_NET_A01_BE.Models;
 using HE186716_DoHuuHoa_SE1884_NET_A01_BE.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace HE186716_DoHuuHoa_SE1884_NET_A01_BE.Services;
 
@@ -107,6 +108,35 @@ public class AccountService : IAccountService
         await _accountRepository.UpdateAsync(account);
 
         return (true, "Password changed successfully");
+    }
+
+    public async Task<PagedResultDto<AccountDto>> SearchPagedAsync(string? keyword, int? role, int pageIndex, int pageSize)
+    {
+        var query = _accountRepository.GetQueryable();
+
+        if (!string.IsNullOrEmpty(keyword))
+        {
+            keyword = keyword.ToLower();
+            query = query.Where(a => (a.AccountName != null && a.AccountName.ToLower().Contains(keyword)) ||
+                                     (a.AccountEmail != null && a.AccountEmail.ToLower().Contains(keyword)));
+        }
+
+        if (role.HasValue)
+        {
+            query = query.Where(a => a.AccountRole == role.Value);
+        }
+
+        var totalCount = await query.CountAsync();
+        
+        var accounts = await query
+            .OrderBy(a => a.AccountId)
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        var dtos = accounts.Select(MapToDto).ToList();
+
+        return new PagedResultDto<AccountDto>(dtos, totalCount, pageIndex, pageSize);
     }
 
     private AccountDto MapToDto(SystemAccount account)

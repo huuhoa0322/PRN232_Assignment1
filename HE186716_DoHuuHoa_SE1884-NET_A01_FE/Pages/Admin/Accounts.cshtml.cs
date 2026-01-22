@@ -17,6 +17,14 @@ public class AccountsModel : PageModel
     [BindProperty(SupportsGet = true)]
     public int? Role { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public int PageIndex { get; set; } = 1;
+
+    public int TotalPages { get; set; }
+    public int PageSize { get; set; } = 10;
+    public bool HasPreviousPage => PageIndex > 1;
+    public bool HasNextPage => PageIndex < TotalPages;
+
     public string? Message { get; set; }
     public bool IsSuccess { get; set; }
 
@@ -30,10 +38,16 @@ public class AccountsModel : PageModel
         if (HttpContext.Session.GetString("IsAdmin") != "True")
             return RedirectToPage("/Auth/Login");
 
-        if (!string.IsNullOrEmpty(Keyword) || Role.HasValue)
-            Accounts = await _apiService.SearchAccountsAsync(Keyword, Role);
+        var pagedResult = await _apiService.SearchAccountsPagedAsync(Keyword, Role, PageIndex, PageSize);
+        if (pagedResult != null)
+        {
+            Accounts = pagedResult.Items;
+            TotalPages = pagedResult.TotalPages;
+        }
         else
-            Accounts = await _apiService.GetAllAccountsAsync();
+        {
+            Accounts = new List<AccountDto>();
+        }
 
         return Page();
     }

@@ -49,13 +49,16 @@ public class NewsController : ControllerBase
     }
 
     /// <summary>
-    /// Search news articles
+    /// Search news articles with pagination
     /// </summary>
     [HttpGet("search")]
-    public async Task<ActionResult<IEnumerable<NewsArticleDto>>> Search([FromQuery] NewsArticleSearchDto searchDto)
+    public async Task<ActionResult<PagedResultDto<NewsArticleDto>>> Search(
+        [FromQuery] NewsArticleSearchDto searchDto,
+        [FromQuery] int pageIndex = 1, 
+        [FromQuery] int pageSize = 10)
     {
-        var articles = await _newsArticleService.SearchAsync(searchDto);
-        return Ok(articles);
+        var result = await _newsArticleService.SearchPagedAsync(searchDto, pageIndex, pageSize);
+        return Ok(result);
     }
 
     /// <summary>

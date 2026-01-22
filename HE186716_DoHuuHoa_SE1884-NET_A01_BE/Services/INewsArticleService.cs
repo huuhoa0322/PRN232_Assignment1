@@ -8,6 +8,7 @@ public interface INewsArticleService
     Task<IEnumerable<NewsArticleDto>> GetActiveArticlesAsync();
     Task<NewsArticleDto?> GetByIdAsync(string id);
     Task<IEnumerable<NewsArticleDto>> SearchAsync(NewsArticleSearchDto searchDto);
+    Task<PagedResultDto<NewsArticleDto>> SearchPagedAsync(NewsArticleSearchDto searchDto, int pageIndex, int pageSize);
     Task<IEnumerable<NewsArticleDto>> FilterByDateRangeAsync(DateTime? startDate, DateTime? endDate);
     Task<IEnumerable<NewsArticleDto>> GetByAuthorAsync(short createdById);
     Task<IEnumerable<NewsArticleDto>> GetRelatedArticlesAsync(string articleId);

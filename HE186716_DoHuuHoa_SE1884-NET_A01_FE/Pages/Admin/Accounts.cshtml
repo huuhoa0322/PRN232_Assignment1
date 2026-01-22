@@ -78,6 +78,37 @@
     </tbody>
 </table>
 
+<!-- Pagination -->
+@if (Model.TotalPages > 0)
+{
+    <nav>
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link" asp-page="./Accounts"
+                   asp-route-pageIndex="@(Model.PageIndex - 1)"
+                   asp-route-keyword="@Model.Keyword"
+                   asp-route-role="@Model.Role">Previous</a>
+            </li>
+            @for (var i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                    <a class="page-link" asp-page="./Accounts"
+                       asp-route-pageIndex="@i"
+                       asp-route-keyword="@Model.Keyword"
+                       asp-route-role="@Model.Role">@i</a>
+                </li>
+            }
+            <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                <a class="page-link" asp-page="./Accounts"
+                   asp-route-pageIndex="@(Model.PageIndex + 1)"
+                   asp-route-keyword="@Model.Keyword"
+                   asp-route-role="@Model.Role">Next</a>
+            </li>
+        </ul>
+    </nav>
+}
+
+
 <!-- Account Modal -->
 <div class="modal fade" id="accountModal" tabindex="-1">
     <div class="modal-dialog">
