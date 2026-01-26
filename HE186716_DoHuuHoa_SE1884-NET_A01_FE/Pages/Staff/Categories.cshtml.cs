@@ -50,7 +50,7 @@ public class CategoriesModel : PageModel
     {
         if (HttpContext.Session.GetString("Role") != "1") 
             return RedirectToPage("/Auth/Login");
-
+         
         if (handler == "Create")
         {
             var dto = new CreateCategoryDto { CategoryName = CategoryName, CategoryDesciption = CategoryDesciption, IsActive = IsActive };
