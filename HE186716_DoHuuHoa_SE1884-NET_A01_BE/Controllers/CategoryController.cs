@@ -48,6 +48,7 @@ public class CategoryController : ControllerBase
         return Ok(category);
     }
 
+
     /// <summary>
     /// Search categories by keyword
     /// </summary>
@@ -57,6 +58,20 @@ public class CategoryController : ControllerBase
         var categories = await _categoryService.SearchAsync(keyword);
         return Ok(categories);
     }
+
+    /// <summary>
+    /// Search categories with pagination
+    /// </summary>
+    [HttpGet("search/paged")]
+    public async Task<ActionResult<PagedResultDto<CategoryDto>>> SearchPaged(
+        [FromQuery] string? keyword,
+        [FromQuery] int pageIndex = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        var result = await _categoryService.SearchPagedAsync(keyword, pageIndex, pageSize);
+        return Ok(result);
+    }
+
 
     /// <summary>
     /// Create a new category

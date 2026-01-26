@@ -9,48 +9,77 @@ public class CategoriesModel : PageModel
 {
     private readonly ApiService _apiService;
     public List<CategoryDto> Categories { get; set; } = new();
+    
+    [TempData]
     public string? Message { get; set; }
+    
+    [TempData]
     public bool IsSuccess { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public string? Keyword { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public int PageIndex { get; set; } = 1;
+
+    public int TotalPages { get; set; }
+    public int PageSize { get; set; } = 10;
+    public int TotalCount { get; set; }
+    public bool HasPreviousPage => PageIndex > 1;
+    public bool HasNextPage => PageIndex < TotalPages;
 
     public CategoriesModel(ApiService apiService) => _apiService = apiService;
 
     public async Task<IActionResult> OnGetAsync()
     {
-        if (HttpContext.Session.GetString("Role") != "1") return RedirectToPage("/Auth/Login");
-        Categories = await _apiService.GetAllCategoriesAsync();
+        if (HttpContext.Session.GetString("Role") != "1") 
+            return RedirectToPage("/Auth/Login");
+        
+        var pagedResult = await _apiService.SearchCategoriesPagedAsync(Keyword, PageIndex, PageSize);
+        if (pagedResult != null)
+        {
+            Categories = pagedResult.Items;
+            TotalPages = pagedResult.TotalPages;
+            TotalCount = pagedResult.TotalCount;
+        }
+        
         return Page();
     }
 
     public async Task<IActionResult> OnPostAsync(string handler, short? CategoryId, string CategoryName, string CategoryDesciption, bool IsActive)
     {
-        if (HttpContext.Session.GetString("Role") != "1") return RedirectToPage("/Auth/Login");
+        if (HttpContext.Session.GetString("Role") != "1") 
+            return RedirectToPage("/Auth/Login");
 
         if (handler == "Create")
         {
             var dto = new CreateCategoryDto { CategoryName = CategoryName, CategoryDesciption = CategoryDesciption, IsActive = IsActive };
             var result = await _apiService.CreateCategoryAsync(dto);
-            Message = result.Success ? "Tạo thành công" : result.Message;
+            Message = result.Message;
             IsSuccess = result.Success;
         }
         else if (handler == "Update" && CategoryId.HasValue)
         {
             var dto = new UpdateCategoryDto { CategoryName = CategoryName, CategoryDesciption = CategoryDesciption, IsActive = IsActive };
             var result = await _apiService.UpdateCategoryAsync(CategoryId.Value, dto);
-            Message = result.Success ? "Cập nhật thành công" : result.Message;
+            Message = result.Message;
             IsSuccess = result.Success;
         }
 
-        Categories = await _apiService.GetAllCategoriesAsync();
-        return Page();
+        // PRG Pattern: Redirect to GET to prevent resubmission
+        return RedirectToPage(new { Keyword, PageIndex });
     }
 
     public async Task<IActionResult> OnPostDeleteAsync(short deleteId)
     {
-        if (HttpContext.Session.GetString("Role") != "1") return RedirectToPage("/Auth/Login");
+        if (HttpContext.Session.GetString("Role") != "1") 
+            return RedirectToPage("/Auth/Login");
+        
         var result = await _apiService.DeleteCategoryAsync(deleteId);
-        Message = result.Success ? "Xóa thành công" : result.Message;
+        Message = result.Message;
         IsSuccess = result.Success;
-        Categories = await _apiService.GetAllCategoriesAsync();
-        return Page();
+        
+        // PRG Pattern: Redirect to GET to prevent resubmission
+        return RedirectToPage(new { Keyword, PageIndex });
     }
 }

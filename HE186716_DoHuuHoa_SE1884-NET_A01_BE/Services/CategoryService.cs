@@ -37,6 +37,14 @@ public class CategoryService : ICategoryService
         return categories.Select(MapToDto);
     }
 
+    public async Task<PagedResultDto<CategoryDto>> SearchPagedAsync(string? keyword, int pageIndex, int pageSize)
+    {
+        var (items, totalCount) = await _categoryRepository.SearchPagedAsync(keyword, pageIndex, pageSize);
+        var dtos = items.Select(MapToDto).ToList();
+        
+        return new PagedResultDto<CategoryDto>(dtos, totalCount, pageIndex, pageSize);
+    }
+
     public async Task<CategoryDto> CreateAsync(CreateCategoryDto dto)
     {
         var category = new Category

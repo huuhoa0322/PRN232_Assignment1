@@ -274,6 +274,30 @@ public class ApiService
         return new();
     }
 
+    public async Task<List<CategoryDto>> SearchCategoriesAsync(string? keyword)
+    {
+        var url = "api/category/search?";
+        if (!string.IsNullOrWhiteSpace(keyword))
+            url += $"keyword={Uri.EscapeDataString(keyword)}";
+        
+        var response = await _httpClient.GetAsync(url.TrimEnd('&', '?'));
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<List<CategoryDto>>(_jsonOptions) ?? new();
+        return new();
+    }
+
+    public async Task<PagedResultDto<CategoryDto>?> SearchCategoriesPagedAsync(string? keyword, int pageIndex, int pageSize)
+    {
+        var url = $"api/category/search/paged?pageIndex={pageIndex}&pageSize={pageSize}&";
+        if (!string.IsNullOrWhiteSpace(keyword))
+            url += $"keyword={Uri.EscapeDataString(keyword)}";
+        
+        var response = await _httpClient.GetAsync(url.TrimEnd('&'));
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<PagedResultDto<CategoryDto>>(_jsonOptions);
+        return null;
+    }
+
     public async Task<(bool Success, string Message)> CreateCategoryAsync(CreateCategoryDto dto)
     {
         var response = await _httpClient.PostAsJsonAsync("api/category", dto);
