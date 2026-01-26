@@ -11,13 +11,16 @@
     </button>
 </div>
 
-@if (!string.IsNullOrEmpty(Model.Message))
-{
-    <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger") alert-dismissible fade show">
-        @Model.Message
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<!-- Toast Container -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="notificationToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage">
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
     </div>
-}
+</div>
 
 <div class="card mb-4">
     <div class="card-body">
@@ -46,7 +49,7 @@
             <th>Tên</th>
             <th>Email</th>
             <th>Role</th>
-            <th>Số bài viếtt</th>
+            <th>Số bài viết</th>
             <th>Thao tác</th>
         </tr>
     </thead>
@@ -203,6 +206,52 @@
     function openDeleteModal(id, name) {
         document.getElementById('deleteId').value = id;
         document.getElementById('deleteName').textContent = name;
+    }
+
+    // Show toast notification if there's a message
+    window.addEventListener('DOMContentLoaded', function() {
+        var message = '@Html.Raw(Model.Message ?? "")';
+        var isSuccess = @Json.Serialize(Model.IsSuccess);
+        
+        if (message) {
+            showToast(message, isSuccess);
+        }
+    });
+
+    function showToast(message, isSuccess) {
+        var toastEl = document.getElementById('notificationToast');
+        var toastBody = document.getElementById('toastMessage');
+        var closeBtn = toastEl.querySelector('.btn-close');
+        
+        // Set message
+        toastBody.textContent = message;
+        
+        // Remove previous classes and styles
+        toastEl.classList.remove('text-bg-success', 'text-bg-danger', 'bg-success', 'bg-danger', 'text-white');
+        toastEl.style.backgroundColor = '';
+        toastEl.style.color = '';
+        
+        // Set color based on success/error
+        if (isSuccess) {
+            toastEl.classList.add('bg-success', 'text-white');
+            toastEl.style.backgroundColor = '#198754'; // Bootstrap green
+        } else {
+            toastEl.classList.add('bg-danger', 'text-white');
+            toastEl.style.backgroundColor = '#dc3545'; // Bootstrap red
+        }
+        
+        // White text for better contrast
+        toastEl.style.color = '#ffffff';
+        
+        // Ensure close button is visible on both backgrounds
+        closeBtn.classList.add('btn-close-white');
+        
+        // Show toast
+        var toast = new bootstrap.Toast(toastEl, {
+            autohide: true,
+            delay: 4000
+        });
+        toast.show();
     }
 </script>
 }
