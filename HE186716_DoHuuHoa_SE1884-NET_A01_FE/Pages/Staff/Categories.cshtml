@@ -1,7 +1,7 @@
 @page
 @model HE186716_DoHuuHoa_SE1884_NET_A01_FE.Pages.Staff.CategoriesModel
 @{
-    ViewData["Title"] = "Quản lý Categories";
+    ViewData["Title"] = "Quản lý Danh mục";
 }
 
 <!-- Toast Container -->
@@ -16,9 +16,9 @@
 </div>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Quản lý Categories</h2>
+    <h2>Quản lý Danh mục</h2>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#categoryModal" onclick="openCreateModal()">
-        + Thêm Category
+        <i class="bi bi-plus-circle"></i> Thêm danh mục 
     </button>
 </div>
 
@@ -51,34 +51,45 @@
 </div>
 
 <table class="table table-striped table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>ID</th>
-            <th>Tên</th>
-            <th>Mô tả</th>
-            <th>Trạng thái</th>
-            <th>Số bài viết</th>
-            <th>Thao tác</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model.Categories.Any())
+<thead class="table-dark">
+    <tr>
+        <th>ID</th>
+        <th>Tên</th>
+        <th>Danh mục cha</th>
+        <th>Mô tả</th>
+        <th>Trạng thái</th>
+        <th>Số bài viết</th>
+        <th>Thao tác</th>
+    </tr>
+</thead>
+<tbody>
+    @if (Model.Categories.Any())
+    {
+        @foreach (var cat in Model.Categories)
         {
-            @foreach (var cat in Model.Categories)
-            {
-                <tr>
-                    <td>@cat.CategoryId</td>
-                    <td>@cat.CategoryName</td>
-                    <td>@cat.CategoryDesciption</td>
-                    <td>
-                        <span class="badge @(cat.IsActive == true ? "bg-success" : "bg-secondary")">
-                            @(cat.IsActive == true ? "Active" : "Inactive")
-                        </span>
-                    </td>
+            <tr>
+                <td>@cat.CategoryId</td>
+                <td>@cat.CategoryName</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(cat.ParentCategoryName))
+                    {
+                        <span class="badge bg-info">@cat.ParentCategoryName</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted fst-italic">Danh mục gốc</span>
+                    }
+                </td>
+                <td>@cat.CategoryDesciption</td>
+                <td>
+                    <span class="badge @(cat.IsActive == true ? "bg-success" : "bg-secondary")">
+                        @(cat.IsActive == true ? "Hoạt động" : "Không hoạt động")
+                    </span>
+                </td>
                     <td>@cat.ArticleCount</td>
                     <td>
                         <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#categoryModal"
-                                onclick='openEditModal(@cat.CategoryId, @Html.Raw(Json.Serialize(cat.CategoryName)), @Html.Raw(Json.Serialize(cat.CategoryDesciption)), @(cat.IsActive == true ? "true" : "false"))'>
+                                onclick='openEditModal(@cat.CategoryId, @Html.Raw(Json.Serialize(cat.CategoryName)), @Html.Raw(Json.Serialize(cat.CategoryDesciption)), @(cat.ParentCategoryId.HasValue ? cat.ParentCategoryId.Value.ToString() : "null"), @(cat.IsActive == true ? "true" : "false"), @cat.ArticleCount)'>
                             Sửa
                         </button>
                         <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
@@ -92,7 +103,7 @@
         else
         {
             <tr>
-                <td colspan="6" class="text-center">Không có dữ liệu</td>
+                <td colspan="7" class="text-center">Không có dữ liệu</td>
             </tr>
         }
     </tbody>
@@ -170,7 +181,7 @@
         <div class="modal-content">
             <form method="post">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Thêm Category</h5>
+                    <h5 class="modal-title" id="modalTitle">Thêm danh mục</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -178,17 +189,30 @@
                     <input type="hidden" name="handler" id="formHandler" value="Create" />
                     
                     <div class="mb-3">
-                        <label class="form-label">Tên Category</label>
-                        <input type="text" name="CategoryName" id="categoryName" class="form-control" required />
+                        <label class="form-label">Tên danh mục <span class="text-danger">*</span></label>
+                        <input type="text" name="CategoryName" id="categoryName" class="form-control" required maxlength="100" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Mô tả</label>
-                        <textarea name="CategoryDesciption" id="categoryDesc" class="form-control" rows="3" required></textarea>
+                        <label class="form-label">Mô tả <span class="text-danger">*</span></label>
+                        <textarea name="CategoryDesciption" id="categoryDesc" class="form-control" rows="3" required maxlength="250"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Danh mục cha</label>
+                        <select name="ParentCategoryId" id="parentCategoryId" class="form-select">
+                            <option value="">-- Không có (Danh mục gốc) --</option>
+                            @foreach (var cat in Model.AllCategories)
+                            {
+                                <option value="@cat.CategoryId">@cat.CategoryName</option>
+                            }
+                        </select>
+                        <small class="form-text text-muted" id="parentCategoryHelp" style="display: none;">
+                            <i class="bi bi-info-circle"></i> Không thể thay đổi danh mục cha vì đã có bài viết
+                        </small>
                     </div>
                     <div class="mb-3">
                         <div class="form-check">
                             <input type="checkbox" name="IsActive" id="isActive" class="form-check-input" value="true" checked />
-                            <label class="form-check-label">Active</label>
+                            <label class="form-check-label">Hoạt động</label>
                         </div>
                     </div>
                 </div>
@@ -272,21 +296,41 @@
     }
 
     function openCreateModal() {
-        document.getElementById('modalTitle').textContent = 'Thêm Category';
+        document.getElementById('modalTitle').textContent = 'Thêm danh mục';
         document.getElementById('formHandler').value = 'Create';
         document.getElementById('categoryId').value = '';
         document.getElementById('categoryName').value = '';
         document.getElementById('categoryDesc').value = '';
+        document.getElementById('parentCategoryId').value = '';
+        document.getElementById('parentCategoryId').disabled = false; // Enable for create
+        document.getElementById('parentCategoryHelp').style.display = 'none';
         document.getElementById('isActive').checked = true;
     }
 
-    function openEditModal(id, name, desc, active) {
-        document.getElementById('modalTitle').textContent = 'Sửa Category';
+    function openEditModal(id, name, desc, parentId, active, articleCount) {
+        document.getElementById('modalTitle').textContent = 'Sửa danh mục';
         document.getElementById('formHandler').value = 'Update';
         document.getElementById('categoryId').value = id;
         document.getElementById('categoryName').value = name;
         document.getElementById('categoryDesc').value = desc;
         document.getElementById('isActive').checked = active;
+        
+        // Set parent category
+        var parentSelect = document.getElementById('parentCategoryId');
+        if (parentId === null || parentId === 'null') {
+            parentSelect.value = '';
+        } else {
+            parentSelect.value = parentId;
+        }
+        
+        // Disable ParentCategoryId if category has articles
+        if (articleCount > 0) {
+            parentSelect.disabled = true;
+            document.getElementById('parentCategoryHelp').style.display = 'block';
+        } else {
+            parentSelect.disabled = false;
+            document.getElementById('parentCategoryHelp').style.display = 'none';
+        }
     }
 
     function openDeleteModal(id, name) {

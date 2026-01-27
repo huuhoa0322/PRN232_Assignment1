@@ -9,6 +9,7 @@ public class CategoriesModel : PageModel
 {
     private readonly ApiService _apiService;
     public List<CategoryDto> Categories { get; set; } = new();
+    public List<CategoryDto> AllCategories { get; set; } = new(); // For parent category dropdown
     
     [TempData]
     public string? Message { get; set; }
@@ -35,6 +36,7 @@ public class CategoriesModel : PageModel
         if (HttpContext.Session.GetString("Role") != "1") 
             return RedirectToPage("/Auth/Login");
         
+        // Load paged categories for display
         var pagedResult = await _apiService.SearchCategoriesPagedAsync(Keyword, PageIndex, PageSize);
         if (pagedResult != null)
         {
@@ -43,24 +45,39 @@ public class CategoriesModel : PageModel
             TotalCount = pagedResult.TotalCount;
         }
         
+        // Load all categories for parent category dropdown
+        AllCategories = await _apiService.GetAllCategoriesAsync(); 
+        
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync(string handler, short? CategoryId, string CategoryName, string CategoryDesciption, bool IsActive)
+    public async Task<IActionResult> OnPostAsync(string handler, short? CategoryId, string CategoryName, string CategoryDesciption, short? ParentCategoryId, bool IsActive)
     {
         if (HttpContext.Session.GetString("Role") != "1") 
             return RedirectToPage("/Auth/Login");
          
         if (handler == "Create")
         {
-            var dto = new CreateCategoryDto { CategoryName = CategoryName, CategoryDesciption = CategoryDesciption, IsActive = IsActive };
+            var dto = new CreateCategoryDto 
+            { 
+                CategoryName = CategoryName, 
+                CategoryDesciption = CategoryDesciption, 
+                ParentCategoryId = ParentCategoryId,
+                IsActive = IsActive 
+            };
             var result = await _apiService.CreateCategoryAsync(dto);
             Message = result.Message;
             IsSuccess = result.Success;
         }
         else if (handler == "Update" && CategoryId.HasValue)
         {
-            var dto = new UpdateCategoryDto { CategoryName = CategoryName, CategoryDesciption = CategoryDesciption, IsActive = IsActive };
+            var dto = new UpdateCategoryDto 
+            { 
+                CategoryName = CategoryName, 
+                CategoryDesciption = CategoryDesciption, 
+                ParentCategoryId = ParentCategoryId,
+                IsActive = IsActive 
+            };
             var result = await _apiService.UpdateCategoryAsync(CategoryId.Value, dto);
             Message = result.Message;
             IsSuccess = result.Success;
