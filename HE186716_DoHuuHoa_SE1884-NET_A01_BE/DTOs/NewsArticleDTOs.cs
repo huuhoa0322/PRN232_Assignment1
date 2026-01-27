@@ -68,6 +68,7 @@ public class UpdateNewsArticleDto
     public List<int>? TagIds { get; set; }
 }
 
+
 public class NewsArticleSearchDto
 {
     public string? Keyword { get; set; }
@@ -75,4 +76,6 @@ public class NewsArticleSearchDto
     public bool? Status { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
+    public short? CreatedById { get; set; } // For Staff - filter by author
 }
+

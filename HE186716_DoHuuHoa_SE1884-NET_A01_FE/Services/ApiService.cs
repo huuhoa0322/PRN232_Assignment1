@@ -106,16 +106,24 @@ public class ApiService
         return new();
     }
 
-    public async Task<PagedResultDto<NewsArticleDto>?> SearchNewsPagedAsync(string? keyword, short? categoryId, int pageIndex, int pageSize)
+    public async Task<PagedResultDto<NewsArticleDto>?> SearchNewsPagedAsync(string? keyword, short? categoryId, int pageIndex, int pageSize, bool? status = null, DateTime? startDate = null, DateTime? endDate = null, short? createdById = null)
     {
         var url = $"api/news/search?pageIndex={pageIndex}&pageSize={pageSize}&";
         if (!string.IsNullOrEmpty(keyword))
             url += $"keyword={Uri.EscapeDataString(keyword)}&";
         if (categoryId.HasValue)
             url += $"categoryId={categoryId}&";
+        if (status.HasValue)
+            url += $"status={status.Value}&";
+        if (startDate.HasValue)
+            url += $"startDate={startDate.Value:yyyy-MM-dd}&";
+        if (endDate.HasValue)
+            url += $"endDate={endDate.Value:yyyy-MM-dd}&";
+        if (createdById.HasValue)
+            url += $"createdById={createdById.Value}&";
         
         var response = await _httpClient.GetAsync(url.TrimEnd('&', '?'));
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode) 
         {
             return await response.Content.ReadFromJsonAsync<PagedResultDto<NewsArticleDto>>(_jsonOptions);
         }
@@ -338,9 +346,22 @@ public class ApiService
 
     public async Task<(bool Success, string Message)> CreateNewsAsync(CreateNewsArticleDto dto, short createdById)
     {
-        var response = await _httpClient.PostAsJsonAsync($"api/news?createdById={createdById}", dto);
-        if (response.IsSuccessStatusCode) return (true, "Tạo bài viết thành công");
-        return (false, await ParseErrorResponseAsync(response));
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync($"api/news?createdById={createdById}", dto);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                return (true, "Tạo bài viết thành công");
+            }
+            
+            var errorMessage = await ParseErrorResponseAsync(response);
+            return (false, $"Lỗi khi tạo bài viết: {errorMessage} (Status: {response.StatusCode})");
+        }
+        catch (Exception ex)
+        {
+            return (false, $"Lỗi kết nối: {ex.Message}");
+        }
     }
 
     public async Task<(bool Success, string Message)> UpdateNewsAsync(string id, UpdateNewsArticleDto dto, short updatedById)

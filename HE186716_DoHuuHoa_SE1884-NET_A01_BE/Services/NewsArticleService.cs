@@ -39,7 +39,8 @@ public class NewsArticleService : INewsArticleService
         var articles = await _newsArticleRepository.SearchAsync(
             searchDto.Keyword,
             searchDto.CategoryId,
-            searchDto.Status);
+            searchDto.Status,
+            searchDto.CreatedById);
 
         // Filter by date range if provided
         if (searchDto.StartDate.HasValue || searchDto.EndDate.HasValue)
@@ -220,7 +221,8 @@ public class NewsArticleService : INewsArticleService
         var articles = await _newsArticleRepository.SearchAsync(
             searchDto.Keyword,
             searchDto.CategoryId,
-            searchDto.Status);
+            searchDto.Status,
+            searchDto.CreatedById);
 
         // Filter by date range if provided - Note: Repository SearchAsync returns IEnumerable, ideally should be IQueryable
         // For now we filter in memory since Repository pattern here returns IEnumerable

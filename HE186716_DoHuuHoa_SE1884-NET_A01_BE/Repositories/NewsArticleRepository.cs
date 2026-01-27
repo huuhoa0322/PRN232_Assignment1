@@ -39,7 +39,7 @@ public class NewsArticleRepository : GenericRepository<NewsArticle>, INewsArticl
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<NewsArticle>> SearchAsync(string? keyword, short? categoryId = null, bool? status = null)
+    public async Task<IEnumerable<NewsArticle>> SearchAsync(string? keyword, short? categoryId = null, bool? status = null, short? createdById = null)
     {
         var query = _dbSet.Include(n => n.Category)
                           .Include(n => n.CreatedBy)
@@ -65,6 +65,12 @@ public class NewsArticleRepository : GenericRepository<NewsArticle>, INewsArticl
         if (status.HasValue)
         {
             query = query.Where(n => n.NewsStatus == status.Value);
+        }
+
+        // Filter by author (for Staff - only see their own articles)
+        if (createdById.HasValue)
+        {
+            query = query.Where(n => n.CreatedById == createdById.Value);
         }
 
         return await query.OrderByDescending(n => n.CreatedDate).ToListAsync();
@@ -133,16 +139,28 @@ public class NewsArticleRepository : GenericRepository<NewsArticle>, INewsArticl
 
     public async Task<string> GenerateNewIdAsync()
     {
-        var maxId = await _dbSet
+        var allIds = await _dbSet
             .Select(n => n.NewsArticleId)
-            .OrderByDescending(id => id)
-            .FirstOrDefaultAsync();
+            .ToListAsync();
 
-        if (string.IsNullOrEmpty(maxId) || !int.TryParse(maxId, out int numericId))
+        if (!allIds.Any())
         {
             return "1";
         }
 
-        return (numericId + 1).ToString();
+        // Parse all IDs to integers
+        var numericIds = allIds
+            .Where(id => int.TryParse(id, out _))
+            .Select(id => int.Parse(id))
+            .ToList();
+
+        if (!numericIds.Any())
+        {
+            return "1";
+        }
+
+        // Get max and increment
+        var maxId = numericIds.Max();
+        return (maxId + 1).ToString();
     }
 }
