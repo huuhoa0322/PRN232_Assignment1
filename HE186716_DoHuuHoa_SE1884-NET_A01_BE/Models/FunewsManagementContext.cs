@@ -76,6 +76,11 @@ public partial class FunewsManagementContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_NewsArticle_SystemAccount");
 
+            entity.HasOne(d => d.UpdatedBy).WithMany()
+                .HasForeignKey(d => d.UpdatedById)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_NewsArticle_SystemAccount_UpdatedBy");
+
             entity.HasMany(d => d.Tags).WithMany(p => p.NewsArticles)
                 .UsingEntity<Dictionary<string, object>>(
                     "NewsTag",

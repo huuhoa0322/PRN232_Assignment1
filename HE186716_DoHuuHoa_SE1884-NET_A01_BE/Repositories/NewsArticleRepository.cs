@@ -14,6 +14,7 @@ public class NewsArticleRepository : GenericRepository<NewsArticle>, INewsArticl
         return await _dbSet
             .Include(n => n.Category)
             .Include(n => n.CreatedBy)
+            .Include(n => n.UpdatedBy)
             .Include(n => n.Tags)
             .OrderByDescending(n => n.CreatedDate)
             .ToListAsync();
@@ -24,6 +25,7 @@ public class NewsArticleRepository : GenericRepository<NewsArticle>, INewsArticl
         return await _dbSet
             .Include(n => n.Category)
             .Include(n => n.CreatedBy)
+            .Include(n => n.UpdatedBy)
             .Include(n => n.Tags)
             .FirstOrDefaultAsync(n => n.NewsArticleId == id);
     }
@@ -34,6 +36,7 @@ public class NewsArticleRepository : GenericRepository<NewsArticle>, INewsArticl
             .Where(n => n.NewsStatus == true)
             .Include(n => n.Category)
             .Include(n => n.CreatedBy)
+            .Include(n => n.UpdatedBy)
             .Include(n => n.Tags)
             .OrderByDescending(n => n.CreatedDate)
             .ToListAsync();
@@ -43,6 +46,7 @@ public class NewsArticleRepository : GenericRepository<NewsArticle>, INewsArticl
     {
         var query = _dbSet.Include(n => n.Category)
                           .Include(n => n.CreatedBy)
+                          .Include(n => n.UpdatedBy)
                           .Include(n => n.Tags)
                           .AsQueryable();
 
@@ -80,6 +84,7 @@ public class NewsArticleRepository : GenericRepository<NewsArticle>, INewsArticl
     {
         var query = _dbSet.Include(n => n.Category)
                           .Include(n => n.CreatedBy)
+                          .Include(n => n.UpdatedBy)
                           .Include(n => n.Tags)
                           .AsQueryable();
 
@@ -101,6 +106,7 @@ public class NewsArticleRepository : GenericRepository<NewsArticle>, INewsArticl
         return await _dbSet
             .Where(n => n.CreatedById == createdById)
             .Include(n => n.Category)
+            .Include(n => n.UpdatedBy)
             .Include(n => n.Tags)
             .OrderByDescending(n => n.CreatedDate)
             .ToListAsync();
