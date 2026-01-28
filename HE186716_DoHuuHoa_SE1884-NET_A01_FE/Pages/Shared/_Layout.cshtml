@@ -74,6 +74,32 @@
 
     <partial name="_ToastAndLoading" />
 
+    <script>
+        // Auto-show toast for TempData messages
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                showToast('@Html.Raw(TempData["SuccessMessage"])', 'success');
+                </text>
+            }
+            
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                showToast('@Html.Raw(TempData["ErrorMessage"])', 'danger');
+                </text>
+            }
+            
+            @if (TempData["InfoMessage"] != null)
+            {
+                <text>
+                showToast('@Html.Raw(TempData["InfoMessage"])', 'info');
+                </text>
+            }
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

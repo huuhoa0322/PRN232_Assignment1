@@ -14,8 +14,6 @@ public class LoginModel : PageModel
     [BindProperty]
     public string Password { get; set; } = null!;
 
-    public string? ErrorMessage { get; set; }
-
     public LoginModel(ApiService apiService)
     {
         _apiService = apiService;
@@ -35,7 +33,7 @@ public class LoginModel : PageModel
     {
         if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password))
         {
-            ErrorMessage = "Vui lòng nhập email và mật khẩu";
+            TempData["ErrorMessage"] = "Vui lòng nhập email và mật khẩu";
             return Page();
         }
 
@@ -43,7 +41,7 @@ public class LoginModel : PageModel
         
         if (result == null)
         {
-            ErrorMessage = "Email hoặc mật khẩu không đúng";
+            TempData["ErrorMessage"] = "Email hoặc mật khẩu không đúng";
             return Page();
         }
 
@@ -54,6 +52,8 @@ public class LoginModel : PageModel
         HttpContext.Session.SetString("Role", result.AccountRole?.ToString() ?? "");
         HttpContext.Session.SetString("RoleName", result.RoleName);
         HttpContext.Session.SetString("IsAdmin", result.IsAdmin.ToString());
+
+        TempData["SuccessMessage"] = "Đăng nhập thành công";
 
         // Redirect based on role
         if (result.IsAdmin)
