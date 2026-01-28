@@ -66,4 +66,16 @@ public class CategoryRepository : GenericRepository<Category>, ICategoryReposito
     {
         return await _dbSet.Where(c => c.IsActive == true).ToListAsync();
     }
+
+    public async Task<bool> CheckCategoryNameExistsAsync(string categoryName, short? excludeCategoryId = null)
+    {
+        var query = _dbSet.Where(c => c.CategoryName.ToLower() == categoryName.ToLower());
+        
+        if (excludeCategoryId.HasValue)
+        {
+            query = query.Where(c => c.CategoryId != excludeCategoryId.Value);
+        }
+         
+        return await query.AnyAsync();
+    }
 }

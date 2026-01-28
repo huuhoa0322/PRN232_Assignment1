@@ -6,7 +6,7 @@ using HE186716_DoHuuHoa_SE1884_NET_A01_FE.Services;
 namespace HE186716_DoHuuHoa_SE1884_NET_A01_FE.Pages.Staff;
 
 public class CategoriesModel : PageModel
-{
+{ 
     private readonly ApiService _apiService;
     public List<CategoryDto> Categories { get; set; } = new();
     public List<CategoryDto> AllCategories { get; set; } = new(); // For parent category dropdown

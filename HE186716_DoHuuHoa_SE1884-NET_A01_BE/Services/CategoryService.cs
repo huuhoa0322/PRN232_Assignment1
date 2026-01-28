@@ -47,6 +47,12 @@ public class CategoryService : ICategoryService
 
     public async Task<CategoryDto> CreateAsync(CreateCategoryDto dto)
     {
+        // Check if category name already exists
+        if (await _categoryRepository.CheckCategoryNameExistsAsync(dto.CategoryName))
+        {
+            throw new InvalidOperationException("Tên danh mục đã tồn tại"); 
+        }
+
         var category = new Category
         {
             CategoryName = dto.CategoryName,
@@ -64,6 +70,12 @@ public class CategoryService : ICategoryService
         var category = await _categoryRepository.GetByIdAsync(id);
         if (category == null)
             return null;
+
+        // Check if category name already exists (excluding current category)
+        if (await _categoryRepository.CheckCategoryNameExistsAsync(dto.CategoryName, id))
+        {
+            throw new InvalidOperationException("Tên danh mục đã tồn tại");
+        }
 
         // REQ 4.3: Check if ParentCategoryID is being changed and category has articles
         if (dto.ParentCategoryId != category.ParentCategoryId)

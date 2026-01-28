@@ -82,9 +82,16 @@ public class CategoryController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var category = await _categoryService.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = category.CategoryId }, category);
-    }
+        try
+        {
+            var category = await _categoryService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = category.CategoryId }, category);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    } 
 
     /// <summary>
     /// Update an existing category
@@ -95,11 +102,18 @@ public class CategoryController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var category = await _categoryService.UpdateAsync(id, dto);
-        if (category == null)
-            return NotFound(new { message = "Không tìm thấy danh mục" });
+        try
+        {
+            var category = await _categoryService.UpdateAsync(id, dto);
+            if (category == null)
+                return NotFound(new { message = "Không tìm thấy danh mục" });
 
-        return Ok(category);
+            return Ok(category);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     /// <summary>
