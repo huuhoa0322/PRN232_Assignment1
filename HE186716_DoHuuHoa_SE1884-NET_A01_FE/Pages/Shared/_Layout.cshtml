@@ -75,30 +75,58 @@
     <partial name="_ToastAndLoading" />
 
     <script>
-        // Auto-show toast for TempData messages
+        // Auto-show toast for TempData messages (only once per message)
         document.addEventListener('DOMContentLoaded', function() {
-            @if (TempData["SuccessMessage"] != null)
+            // Function to show toast only once using sessionStorage
+            function showToastOnce(message, type, key) {
+                if (!message) return;
+                
+                // Check if this message was already shown
+                var shownKey = 'toast_shown_' + key;
+                if (sessionStorage.getItem(shownKey)) {
+                    return; // Already shown, skip
+                }
+                
+                // Show toast and mark as shown
+                showToast(message, type);
+                sessionStorage.setItem(shownKey, 'true');
+            }
+            
+            @if (TempData.Peek("SuccessMessage") != null)
             {
                 <text>
-                showToast('@Html.Raw(TempData["SuccessMessage"])', 'success');
+                var successMsg = '@Html.Raw(TempData["SuccessMessage"])';
+                var successKey = '@DateTime.Now.Ticks';
+                showToastOnce(successMsg, 'success', successKey);
                 </text>
             }
             
-            @if (TempData["ErrorMessage"] != null)
+            @if (TempData.Peek("ErrorMessage") != null)
             {
                 <text>
-                showToast('@Html.Raw(TempData["ErrorMessage"])', 'danger');
+                var errorMsg = '@Html.Raw(TempData["ErrorMessage"])';
+                var errorKey = '@DateTime.Now.Ticks';
+                showToastOnce(errorMsg, 'danger', errorKey);
                 </text>
             }
             
-            @if (TempData["InfoMessage"] != null)
+            @if (TempData.Peek("InfoMessage") != null)
             {
                 <text>
-                showToast('@Html.Raw(TempData["InfoMessage"])', 'info');
+                var infoMsg = '@Html.Raw(TempData["InfoMessage"])';
+                var infoKey = '@DateTime.Now.Ticks';
+                showToastOnce(infoMsg, 'info', infoKey);
                 </text>
             }
         });
     </script>
+    
+    @{
+        // Consume TempData after reading to ensure it's deleted
+        _ = TempData["SuccessMessage"];
+        _ = TempData["ErrorMessage"];
+        _ = TempData["InfoMessage"];
+    }
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
