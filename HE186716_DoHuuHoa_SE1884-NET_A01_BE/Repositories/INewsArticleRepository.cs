@@ -7,7 +7,7 @@ public interface INewsArticleRepository : IGenericRepository<NewsArticle>
     Task<IEnumerable<NewsArticle>> GetAllWithDetailsAsync();
     Task<NewsArticle?> GetByIdWithDetailsAsync(string id);
     Task<IEnumerable<NewsArticle>> GetActiveArticlesAsync();
-    Task<IEnumerable<NewsArticle>> SearchAsync(string? keyword, short? categoryId = null, bool? status = null, short? createdById = null);
+    Task<IEnumerable<NewsArticle>> SearchAsync(string? keyword, short? categoryId = null, bool? status = null, short? createdById = null, int? tagId = null);
     Task<IEnumerable<NewsArticle>> FilterByDateRangeAsync(DateTime? startDate, DateTime? endDate);
     Task<IEnumerable<NewsArticle>> GetByAuthorAsync(short createdById);
     Task<IEnumerable<NewsArticle>> GetRelatedArticlesAsync(string currentArticleId, short? categoryId, int count = 3);

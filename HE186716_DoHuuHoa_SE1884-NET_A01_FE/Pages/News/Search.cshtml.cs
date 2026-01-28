@@ -15,8 +15,22 @@ public class SearchModel : PageModel
     [BindProperty(SupportsGet = true)]
     public short? CategoryId { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public int? TagId { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public DateTime? StartDate { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public DateTime? EndDate { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public string? SortBy { get; set; } = "date"; // "date" or "title"
+
     public List<NewsArticleDto> Articles { get; set; } = new();
     public List<CategoryDto> Categories { get; set; } = new();
+    public List<TagDto> Tags { get; set; } = new();
+    public int TotalCount { get; set; }
 
     public SearchModel(ApiService apiService)
     {
@@ -26,14 +40,37 @@ public class SearchModel : PageModel
     public async Task OnGetAsync()
     {
         Categories = await _apiService.GetActiveCategoriesAsync();
+        Tags = await _apiService.GetAllTagsAsync();
 
-        if (!string.IsNullOrEmpty(Keyword) || CategoryId.HasValue)
+        // Get articles with all filters
+        if (!string.IsNullOrEmpty(Keyword) || CategoryId.HasValue || TagId.HasValue || StartDate.HasValue || EndDate.HasValue)
         {
-            Articles = await _apiService.SearchNewsAsync(Keyword, CategoryId);
+            var result = await _apiService.SearchNewsAdvancedAsync(
+                keyword: Keyword,
+                categoryId: CategoryId,
+                tagId: TagId,
+                startDate: StartDate,
+                endDate: EndDate,
+                sortBy: SortBy
+            );
+            Articles = result;
         }
         else
         {
             Articles = await _apiService.GetActiveNewsAsync();
         }
+
+        // Apply client-side sorting if needed (fallback)
+        Articles = ApplySorting(Articles, SortBy);
+        TotalCount = Articles.Count;
+    }
+
+    private List<NewsArticleDto> ApplySorting(List<NewsArticleDto> articles, string? sortBy)
+    {
+        return sortBy?.ToLower() switch
+        {
+            "title" => articles.OrderBy(a => a.NewsTitle ?? a.Headline).ToList(),
+            _ => articles.OrderByDescending(a => a.CreatedDate).ToList()
+        };
     }
 }

@@ -148,6 +148,48 @@ public class ApiService
         return new();
     }
 
+    public async Task<List<NewsArticleDto>> SearchNewsAdvancedAsync(
+        string? keyword = null,
+        short? categoryId = null,
+        int? tagId = null,
+        DateTime? startDate = null,
+        DateTime? endDate = null,
+        string? sortBy = null)
+    {
+        var url = "api/news/search?pageSize=1000&"; // Get all results
+        if (!string.IsNullOrEmpty(keyword))
+            url += $"keyword={Uri.EscapeDataString(keyword)}&";
+        if (categoryId.HasValue)
+            url += $"categoryId={categoryId}&";
+        if (startDate.HasValue)
+            url += $"startDate={startDate.Value:yyyy-MM-dd}&";
+        if (endDate.HasValue)
+            url += $"endDate={endDate.Value:yyyy-MM-dd}&";
+        
+        var response = await _httpClient.GetAsync(url.TrimEnd('&', '?'));
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<NewsArticleDto>>(_jsonOptions);
+            var articles = result?.Items ?? new List<NewsArticleDto>();
+            
+            // Filter by tag if specified (client-side since backend may not support it yet)
+            if (tagId.HasValue && tagId.Value > 0)
+            {
+                articles = articles.Where(a => a.Tags.Any(t => t.TagId == tagId.Value)).ToList();
+            }
+            
+            // Apply sorting
+            articles = sortBy?.ToLower() switch
+            {
+                "title" => articles.OrderBy(a => a.NewsTitle ?? a.Headline).ToList(),
+                _ => articles.OrderByDescending(a => a.CreatedDate).ToList()
+            };
+            
+            return articles;
+        }
+        return new();
+    }
+
     // ===== CATEGORIES =====
     public async Task<List<CategoryDto>> GetActiveCategoriesAsync()
     {

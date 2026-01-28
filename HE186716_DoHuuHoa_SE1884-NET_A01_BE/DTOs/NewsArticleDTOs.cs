@@ -69,13 +69,18 @@ public class UpdateNewsArticleDto
 }
 
 
+
+
 public class NewsArticleSearchDto
 {
     public string? Keyword { get; set; }
     public short? CategoryId { get; set; }
+    public int? TagId { get; set; } // Filter by tag
     public bool? Status { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public short? CreatedById { get; set; } // For Staff - filter by author
+    public string? SortBy { get; set; } = "date"; // "date" or "title"
 }
+
 

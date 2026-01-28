@@ -40,7 +40,8 @@ public class NewsArticleService : INewsArticleService
             searchDto.Keyword,
             searchDto.CategoryId,
             searchDto.Status,
-            searchDto.CreatedById);
+            searchDto.CreatedById,
+            searchDto.TagId);
 
         // Filter by date range if provided
         if (searchDto.StartDate.HasValue || searchDto.EndDate.HasValue)
@@ -50,7 +51,19 @@ public class NewsArticleService : INewsArticleService
                 (!searchDto.EndDate.HasValue || a.CreatedDate <= searchDto.EndDate.Value));
         }
 
+        // Apply sorting
+        articles = ApplySorting(articles, searchDto.SortBy);
+
         return articles.Select(MapToDto);
+    }
+
+    private IEnumerable<NewsArticle> ApplySorting(IEnumerable<NewsArticle> articles, string? sortBy)
+    {
+        return sortBy?.ToLower() switch
+        {
+            "title" => articles.OrderBy(a => a.NewsTitle ?? a.Headline),
+            _ => articles.OrderByDescending(a => a.CreatedDate)
+        };
     }
 
     public async Task<IEnumerable<NewsArticleDto>> FilterByDateRangeAsync(DateTime? startDate, DateTime? endDate)
@@ -223,7 +236,8 @@ public class NewsArticleService : INewsArticleService
             searchDto.Keyword,
             searchDto.CategoryId,
             searchDto.Status,
-            searchDto.CreatedById);
+            searchDto.CreatedById,
+            searchDto.TagId);
 
         // Filter by date range if provided - Note: Repository SearchAsync returns IEnumerable, ideally should be IQueryable
         // For now we filter in memory since Repository pattern here returns IEnumerable
@@ -234,10 +248,12 @@ public class NewsArticleService : INewsArticleService
                 (!searchDto.EndDate.HasValue || a.CreatedDate <= searchDto.EndDate.Value));
         }
 
+        // Apply sorting
+        articles = ApplySorting(articles, searchDto.SortBy);
+
         var totalCount = articles.Count();
         
         var pagedArticles = articles
-            .OrderByDescending(a => a.CreatedDate)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToList();

@@ -42,7 +42,7 @@ public class NewsArticleRepository : GenericRepository<NewsArticle>, INewsArticl
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<NewsArticle>> SearchAsync(string? keyword, short? categoryId = null, bool? status = null, short? createdById = null)
+    public async Task<IEnumerable<NewsArticle>> SearchAsync(string? keyword, short? categoryId = null, bool? status = null, short? createdById = null, int? tagId = null)
     {
         var query = _dbSet.Include(n => n.Category)
                           .Include(n => n.CreatedBy)
@@ -75,6 +75,12 @@ public class NewsArticleRepository : GenericRepository<NewsArticle>, INewsArticl
         if (createdById.HasValue)
         {
             query = query.Where(n => n.CreatedById == createdById.Value);
+        }
+
+        // Filter by tag
+        if (tagId.HasValue)
+        {
+            query = query.Where(n => n.Tags.Any(t => t.TagId == tagId.Value));
         }
 
         return await query.OrderByDescending(n => n.CreatedDate).ToListAsync();
