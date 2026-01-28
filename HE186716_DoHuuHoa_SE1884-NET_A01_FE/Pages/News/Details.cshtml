@@ -6,7 +6,7 @@
 
 @if (Model.Article == null)
 {
-    <div class="alert alert-warning">
+    <div class="alert alert-warning"> 
         Không tìm thấy bài viết. <a asp-page="/Index">Quay lại trang chủ</a>
     </div>
 }
@@ -27,11 +27,11 @@ else
                     <span class="badge bg-primary">@Model.Article.CategoryName</span>
                     @if (Model.Article.NewsStatus == true)
                     {
-                        <span class="badge bg-success">Active</span>
+                        <span class="badge bg-success">Hoạt động</span>
                     }
                     else
                     {
-                        <span class="badge bg-secondary">Inactive</span>
+                        <span class="badge bg-secondary">Không hoạt động</span>
                     }
                 </div>
                 

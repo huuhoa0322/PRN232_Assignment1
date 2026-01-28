@@ -1,17 +1,18 @@
 @page
 @model HE186716_DoHuuHoa_SE1884_NET_A01_FE.Pages.Admin.IndexModel
 @{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = "Trang quản trị";
 }
 
-<h2>Admin Dashboard</h2>
+<h2>Trang quản trị</h2>
+<p>Xin chào, <strong>@ViewContext.HttpContext.Session.GetString("UserName")</strong>!</p> 
 
 <div class="row mb-4">
     <div class="col-md-6">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Quản lý Accounts</h5>
-                <p class="card-text">Quản lý tài khoản hệ thống (Staff, Lecturer)</p>
+                <h5 class="card-title">Quản lý tài khoản</h5>
+                <p class="card-text">Quản lý tài khoản hệ thống (Nhân viên, Giảng viên)</p>
                 <a asp-page="/Admin/Accounts" class="btn btn-primary">Xem danh sách</a>
             </div>
         </div>

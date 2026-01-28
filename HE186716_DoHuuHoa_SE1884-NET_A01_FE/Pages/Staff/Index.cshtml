@@ -1,17 +1,17 @@
 @page
 @model HE186716_DoHuuHoa_SE1884_NET_A01_FE.Pages.Staff.IndexModel
 @{
-    ViewData["Title"] = "Staff Dashboard";
+    ViewData["Title"] = "Trang quản lý";
 }
 
-<h2>Staff Dashboard</h2>
-<p>Xin chào, <strong>@ViewContext.HttpContext.Session.GetString("UserName")</strong>!</p>
+<h2>Trang quản lý</h2>
+<p>Xin chào, <strong>@ViewContext.HttpContext.Session.GetString("UserName")</strong>!</p> 
 
 <div class="row">
     <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Quản lý Categories</h5>
+                <h5 class="card-title">Quản lý danh mục</h5>
                 <p class="card-text">Quản lý danh mục tin tức</p>
                 <a asp-page="/Staff/Categories" class="btn btn-primary">Xem</a>
             </div>
@@ -20,7 +20,7 @@
     <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Quản lý Articles</h5>
+                <h5 class="card-title">Quản lý bài viết</h5>
                 <p class="card-text">Quản lý bài viết tin tức</p>
                 <a asp-page="/Staff/Articles" class="btn btn-primary">Xem</a>
             </div>

@@ -26,7 +26,7 @@ else
             <tr>
                 <th>ID</th>
                 <th>Tiêu đề</th>
-                <th>Category</th>
+                <th>Danh mục</th>
                 <th>Ngày tạo</th>
                 <th>Trạng thái</th>
             </tr>
@@ -45,13 +45,13 @@ else
                     <td>@article.CreatedDate?.ToString("dd/MM/yyyy")</td>
                     <td>
                         <span class="badge @(article.NewsStatus == true ? "bg-success" : "bg-secondary")">
-                            @(article.NewsStatus == true ? "Active" : "Inactive")
+                            @(article.NewsStatus == true ? "Hoạt động" : "Không hoạt động")
                         </span>
                     </td>
                 </tr>
             }
         </tbody>
-    </table>
+    </table> 
     
     <!-- Pagination -->
     @if (Model.TotalPages > 1)
