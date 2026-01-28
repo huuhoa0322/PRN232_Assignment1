@@ -129,19 +129,18 @@ public class NewsArticleRepository : GenericRepository<NewsArticle>, INewsArticl
 
         var currentTagIds = currentArticle.Tags.Select(t => t.TagId).ToList();
 
+        // Base query: exclude current article and only active articles
         var relatedQuery = _dbSet
             .Where(n => n.NewsArticleId != currentArticleId && n.NewsStatus == true)
             .Include(n => n.Category)
+            .Include(n => n.CreatedBy)
             .Include(n => n.Tags)
             .AsQueryable();
 
-        // Priority: same category OR same tags
-        if (categoryId.HasValue)
-        {
-            relatedQuery = relatedQuery.Where(n => 
-                n.CategoryId == categoryId.Value || 
-                n.Tags.Any(t => currentTagIds.Contains(t.TagId)));
-        }
+        // Filter: same category OR share at least one tag
+        relatedQuery = relatedQuery.Where(n => 
+            (categoryId.HasValue && n.CategoryId == categoryId.Value) || 
+            (currentTagIds.Any() && n.Tags.Any(t => currentTagIds.Contains(t.TagId))));
 
         return await relatedQuery
             .OrderByDescending(n => n.CreatedDate)
