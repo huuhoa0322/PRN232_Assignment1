@@ -36,6 +36,16 @@ public class NewsController : ControllerBase
     }
 
     /// <summary>
+    /// Get all news articles for authenticated users (Admin, Staff, Lecturer) - including inactive articles
+    /// </summary>
+    [HttpGet("lecturer")]
+    public async Task<ActionResult<IEnumerable<NewsArticleDto>>> GetAllForLecturer()
+    {
+        var articles = await _newsArticleService.GetAllAsync();
+        return Ok(articles);
+    }
+
+    /// <summary>
     /// Get news article by ID
     /// </summary>
     [HttpGet("{id}")]

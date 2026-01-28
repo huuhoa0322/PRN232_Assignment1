@@ -86,6 +86,16 @@ public class ApiService
         return new();
     }
 
+    public async Task<List<NewsArticleDto>> GetNewsForLecturerAsync()
+    {
+        var response = await _httpClient.GetAsync("api/news/lecturer");
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<List<NewsArticleDto>>(_jsonOptions) ?? new();
+        }
+        return new();
+    }
+
     public async Task<NewsArticleDto?> GetNewsDetailAsync(string id)
     {
         var response = await _httpClient.GetAsync($"api/news/{id}");
