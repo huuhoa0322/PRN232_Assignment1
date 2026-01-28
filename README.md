@@ -1,12 +1,12 @@
 # FU News Management System
 
-## Thông tin dự án
-- **Sinh viên**: Đỗ Hữu Hòa (HE186716)
-- **Mã lớp**: SE1884-NET
-- **Môn học**: PRN232 - Building Cross-Platform Back-End Application With .NET
+## Project Information
+- **Student**: Do Huu Hoa (HE186716)
+- **Class Code**: SE1884-NET
+- **Course**: PRN232 - Building Cross-Platform Back-End Application With .NET
 - **Assignment**: 01
 
-## Công nghệ sử dụng
+## Technologies Used
 - **.NET 8.0**
 - **ASP.NET Core Web API** (Backend)
 - **ASP.NET Core Razor Pages** (Frontend)
@@ -14,7 +14,7 @@
 - **SQL Server** (Database)
 - **Bootstrap 5** (UI Framework)
 
-## Cấu trúc Project
+## Project Structure
 
 ```
 HE186716_DoHuuHoa_A01/
@@ -36,14 +36,14 @@ HE186716_DoHuuHoa_A01/
     └── Services/                          # API Service calls
 ```
 
-## Hướng dẫn cài đặt
+## Installation Guide
 
-### 1. Yêu cầu hệ thống
+### 1. System Requirements
 - Visual Studio 2026
 - .NET 8.0 SDK
 - SQL Server 2025
 
-### 2. Cấu hình Connection String
+### 2. Configure Connection String
 **Backend** (`appsettings.json`):
 ```json
 {
@@ -53,87 +53,87 @@ HE186716_DoHuuHoa_A01/
 }
 ```
 
-### 3. Chạy ứng dụng
+### 3. Run the Application
 
 **Backend:**
 ```bash
 cd HE186716_DoHuuHoa_SE1884-NET_A01_BE
 dotnet run
-# API: http://localhost:5184
+# API: http://localhost:xxxx (base on your port)
 ```
 
 **Frontend:**
 ```bash
 cd HE186716_DoHuuHoa_SE1884-NET_A01_FE
 dotnet run
-# Web: http://localhost:5000
+# Web: http://localhost:xxxx (base on your port)
 ```
 
 ## API Endpoints
 
 ### Authentication
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| POST | `/api/auth/login` | Đăng nhập |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/login` | Login |
 
 ### Account (Admin)
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| GET | `/api/account` | Danh sách |
-| POST | `/api/account` | Tạo mới |
-| PUT | `/api/account/{id}` | Cập nhật |
-| DELETE | `/api/account/{id}` | Xóa |
-| PUT | `/api/account/{id}/change-password` | Đổi mật khẩu |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/account` | Get all accounts |
+| POST | `/api/account` | Create new account |
+| PUT | `/api/account/{id}` | Update account |
+| DELETE | `/api/account/{id}` | Delete account |
+| PUT | `/api/account/{id}/change-password` | Change password |
 
 ### Category (Staff)
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| GET | `/api/category` | Danh sách |
-| POST | `/api/category` | Tạo mới |
-| PUT | `/api/category/{id}` | Cập nhật |
-| DELETE | `/api/category/{id}` | Xóa |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/category` | Get all categories |
+| POST | `/api/category` | Create new category |
+| PUT | `/api/category/{id}` | Update category |
+| DELETE | `/api/category/{id}` | Delete category |
 
 ### News Article
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| GET | `/api/news` | Tin active (public) |
-| GET | `/api/news/all` | Tất cả |
-| POST | `/api/news` | Tạo mới |
-| PUT | `/api/news/{id}` | Cập nhật |
-| DELETE | `/api/news/{id}` | Xóa |
-| POST | `/api/news/{id}/duplicate` | Duplicate |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/news` | Get active news (public) |
+| GET | `/api/news/all` | Get all news |
+| POST | `/api/news` | Create new article |
+| PUT | `/api/news/{id}` | Update article |
+| DELETE | `/api/news/{id}` | Delete article |
+| POST | `/api/news/{id}/duplicate` | Duplicate article |
 
 ### Tag
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| GET | `/api/tag` | Danh sách |
-| POST | `/api/tag` | Tạo mới |
-| PUT | `/api/tag/{id}` | Cập nhật |
-| DELETE | `/api/tag/{id}` | Xóa |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/tag` | Get all tags |
+| POST | `/api/tag` | Create new tag |
+| PUT | `/api/tag/{id}` | Update tag |
+| DELETE | `/api/tag/{id}` | Delete tag |
 
 ### Report (Admin)
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| GET | `/api/report/statistics` | Thống kê |
-| GET | `/api/report/export` | Export CSV |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/report/statistics` | Get statistics |
+| GET | `/api/report/export` | Export to CSV |
 
-## Tài khoản Test
+## Test Accounts
 
 | Role | Email | Password |
 |------|-------|----------|
 | Admin | `admin@FUNewsManagementSystem.org` | `@@abc123@@` |
-| Staff | *(xem database)* | *(xem database)* |
+| Staff | *(see database)* | *(see database)* |
 
-## Phân quyền
+## Authorization
 
-| Role | Quyền hạn |
-|------|-----------|
-| **Admin** | Quản lý Accounts, Báo cáo |
-| **Staff** | Quản lý Categories, Articles, Tags |
-| **Lecturer** | Xem tin tức |
-| **Guest** | Xem tin tức active |
+| Role | Permissions |
+|------|-------------|
+| **Admin** | Manage Accounts, View Reports |
+| **Staff** | Manage Categories, Articles, Tags |
+| **Lecturer** | View news articles |
+| **Guest** | View active news articles |
 
-## Patterns
+## Design Patterns
 - 3-Layer Architecture
 - Repository Pattern
 - DTO Pattern
